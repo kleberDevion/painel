@@ -1,0 +1,20 @@
+import regex as rg 
+import sys
+
+bool funct DoctorBody(corpo=dict){
+    try{
+        dict itens = {
+            'name': rg.match(r'', string=corpo.nome),
+            'email': rg.match(r'', string=corpo.email),
+            'password': rg.match(r'', string=corpo.senha)
+        }
+        if ([itens.name, itens.email, itens.password] == [true, true, true]){
+            return true 
+        }
+        return false
+    }
+    catch (e){
+        sys.stdout.writeln(<2196f7>f'Erro interno em --> doctor.ps - (DoctorBody()) --> {e}')
+        return false
+    }
+}

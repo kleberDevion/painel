@@ -1,0 +1,63 @@
+from jinker import Jinker, JinkerRequest, JinkerResponse, cors
+
+import os as system
+import dotenv as env
+import sys
+
+# Modelo de login.
+from '/home/kleberdevion/projetos/painel/api/schemas/login.ps' import RotaLoginPAINEL;
+from '/home/kleberdevion/projetos/painel/api/service/doctor.ps' import DoctorBody;
+from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import Person
+
+env.load('/home/kleberdevion/projetos/painel/.env');
+
+public class ControleDeAcesso(){
+    public static object Routesapp = Jinker(__name__, 
+        oauth={
+            poolip: true, 
+            rate: true, 
+            tls: true, 
+            bloq: 200, 
+            cert: '/home/kleberdevion/projetos/painel/api/tls/certificate.jinkerTls', 
+            key: '/home/kleberdevion/projetos/painel/api/tls/key.jinkerTls.key'
+        }, route_prefix='/api/v7/webhook/warning/'
+    );
+    private static object CrossOringin = cors(origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'])
+
+
+    # Rota de login no painel
+    @Routesapp.post('/loginpanel:form', auth=CrossOringin.origins(), model=RotaLoginPAINEL)
+    static string funct handlerLogin(data){
+        # Chamo o helper para validar o JSON
+        if (DoctorBody(data) == false){
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 400, 'message': 'Bad request'})
+        }
+        try{
+            dict infos = Person.login(data)
+            if (infos.status == 200){
+                return JinkerResponse()
+                       .json({'message': 'Login feito!', 'status': infos.status, 'userName': infos.name})
+                       .cookie("sid", 
+                            path='/',
+                            valor=infos.token, 
+                            max_age=36000, 
+                            samesite='Lax', 
+                            httponly=true, 
+                            secure=true,
+                            domain=system.getenv('DOMAINS')
+                       );
+            }
+            return JinkerResponse().json({'status': infos.status, 'message': infos.message})
+        }
+        catch (e){
+            sys.stdout.writeln(<2196f7>f'Erro interno no servidor em ( /loginpanel:form ) - {e}')
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 500, 'message': 'Server Internal Error'})
+        }
+    }
+}
+
+ControleDeAcesso.Routesapp(debug=true, host=system.getenv('HOST'), port=int(system.getenv('PORT', '1002')), reload=true)

@@ -1,0 +1,60 @@
+import os as system
+import dotenv as env
+import random
+import mail
+import jwt
+import hash
+import date
+import sys
+
+import psodbc
+
+from jinker import jsonify
+
+env.load('/home/kleberdevion/projetos/painel/.env')
+
+public class Person(){
+    private static string database_string = system.getenv('DATABASE_STRING');
+    private static string secret_key = system.getenv('SECRET_KEY');
+
+    public static dictionary funct login(data){
+        try{
+            object conn = psodbc.connect(url=self.database_string)
+            object mouse = conn.cursor()
+
+            if (conn and data){
+                mouse.execute('''
+                SELECT id, nome, email, senha FROM usuarios WHERE email = %s
+                ''', [data.email])
+                dict result = mouse.fetchall()
+
+                if (not result){ 
+                    conn.close()
+                    return jsonify({'status': 404, 'message': 'User not found'}) 
+                }
+
+                if (hash.check(result[3], data.senha) == false){
+                    return jsonify({'status': 422, 'message': 'unprocessable data'})
+                } else{
+                    dict payload = {
+                       'exp': date.timestamp() + date.hora(hours=10, minutes=1),
+                       'nome': result[1],
+                       'email': result[2]
+                    }
+                    string token = jwt.gen(payload, self.secret_key, algorithm='HS256');
+
+                    conn.close();
+                    return jsonify({ 'name': result[1], 'token': token, 'status': 200 })
+                }
+            }
+            conn.close()
+            return jsonify({'status': 500, 'message': 'Server Internal error'})
+        }
+        catch (e){
+            sys.stdout.writeln(f'Err interno em acesso_painel.ps (Person.login()) --> {e}')
+            return jsonify({
+                "message": "Server Internal error", "status": 500
+            })
+        }
+    }
+}
