@@ -6,18 +6,17 @@ import jwt
 import hash
 import date
 import sys
-
 import psodbc
 
 from jinker import jsonify
 
 env.load('/home/kleberdevion/projetos/painel/.env')
 
-public class Person(){
+public class PersonOperador(){
     private static string database_string = system.getenv('DATABASE_STRING');
     private static string secret_key = system.getenv('SECRET_KEY');
 
-    public static dictionary funct login(data){
+    public static dictionary funct login(data=dict){
         try{
             object conn = psodbc.connect(url=self.database_string)
             object mouse = conn.cursor()
@@ -34,7 +33,8 @@ public class Person(){
                 }
 
                 if (hash.check(result[3], data.senha) == false){
-                    return jsonify({'status': 422, 'message': 'unprocessable data'})
+                    conn.close()
+                    return jsonify({'status': 405, 'message': 'Credentials error'})
                 } else{
                     dict payload = {
                        'exp': date.timestamp() + date.hora(hours=10, minutes=1),
@@ -48,10 +48,53 @@ public class Person(){
                 }
             }
             conn.close()
-            return jsonify({'status': 500, 'message': 'Server Internal error'})
+            return jsonify({'status': 422, 'message': 'Server Internal error'})
         }
         catch (e){
-            sys.stdout.writeln(f'Err interno em acesso_painel.ps (Person.login()) --> {e}')
+            sys.stdout.writeln(f'Erro interno em acesso_painel.ps (Person.login()) --> {e}')
+            return jsonify({
+                "message": "Server Internal error", "status": 500
+            })
+        }
+    }
+
+    public static dictionary funct singin(data=dict){
+        try{
+            object conn = psodbc.connect(url=system.getenv('DATABASE_STRING'))
+            object mouse = conn.cursor()
+
+            if (conn and data){
+                mouse.execute('''
+                SELECT nome, email FROM usuarios WHERE email = %s AND nome = %s
+                ''', [data.email, data.nome])
+                dict result = mouse.fetchall()
+
+                if (result){ 
+                    conn.close(); return jsonify({'message': 'Data Conflit', 'status': 409}) 
+                }
+                integer acc_id = random.asterisco().randint(limit=25)
+
+                string senha_hashed = hash.crypt(data.senha)
+                string email_hashed = hash.crypt(data.email)
+                string nome_hashed = hash.crypt(data.email)
+
+                mouse.execute('INSERT INTO usuarios (nome, email, senha, acc_id, data_login) VALUES (%s, %s, %s, %s, %s)', 
+                [nome_hashed, email_hashed, senha_hashed, acc_id, date.datahora()]); integer resultrow = mouse.rowcount;
+
+                if (resultrow > 0){
+                    conn.commit(); conn.close()
+                    return jsonify({
+                        'message': 'Account successfully created', 'status': 201
+                    })
+                }
+                conn.close()
+                return jsonify({'message': 'An internal error occurred', 'status': 422})
+            }
+            conn.close()
+            return jsonify({ "message": 'Server internal error', "status": 422 })
+        }
+        catch (e){
+            sys.stdout.writeln(f'Erro interno em acesso_painel.ps (Person.singin()) --> {e}')
             return jsonify({
                 "message": "Server Internal error", "status": 500
             })

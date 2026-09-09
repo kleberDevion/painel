@@ -5,9 +5,9 @@ import dotenv as env
 import sys
 
 # Modelo de login.
-from '/home/kleberdevion/projetos/painel/api/schemas/login.ps' import RotaLoginPAINEL;
-from '/home/kleberdevion/projetos/painel/api/service/doctor.ps' import DoctorBody;
-from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import Person
+from '/home/kleberdevion/projetos/painel/api/schemas/models/login.ps' import RotaLoginPAINEL, RotaSinginPAINEL;
+from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.ps' import DoctorBody;
+from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import PersonOperador
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
@@ -27,15 +27,15 @@ public class ControleDeAcesso(){
 
     # Rota de login no painel
     @Routesapp.post('/loginpanel:form', auth=CrossOringin.origins(), model=RotaLoginPAINEL)
-    static string funct handlerLogin(data){
+    static string funct handlerLogin(form){
         # Chamo o helper para validar o JSON
-        if (DoctorBody(data) == false){
+        if (DoctorBody(form) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
         }
         try{
-            dict infos = Person.login(data)
+            dict infos = PersonOperador.login(form)
             if (infos.status == 200){
                 return JinkerResponse()
                        .json({'message': 'Login feito!', 'status': infos.status, 'userName': infos.name})
@@ -47,7 +47,7 @@ public class ControleDeAcesso(){
                             httponly=true, 
                             secure=true,
                             domain=system.getenv('DOMAINS')
-                       );
+                       ); # Assino o token com id de sessão
             }
             return JinkerResponse().json({'status': infos.status, 'message': infos.message})
         }
@@ -58,6 +58,34 @@ public class ControleDeAcesso(){
                    .json({'status': 500, 'message': 'Server Internal Error'})
         }
     }
+
+    # Criar conta de usuario
+    @Routesapp.post('/sing-inpanel:form', model=RotaSinginPAINEL, auth=CrossOrigin.origins())
+    static string funct handlerSingin(form){
+        if (DoctorBody(form) == false){
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 400, 'message': 'Bad request'})
+        }
+        try{
+            dict infos = PersonOperador.singin(form)
+            if (infos.status == 201){
+                return JinkerResponse()
+                       .header('Content-Type', 'application/json')
+                       .json({'message': infos.message, 'status': infos.status})
+            }
+            return JinkerResponse().json({'status': infos.status, 'message': infos.message})
+        }
+        catch (e){
+            sys.stdout.writeln(<2196f7>f'Erro interno no servidor em ( /sing-inpanel:form ) - {e}')
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 500, 'message': 'Server Internal Error'})
+        }
+    }
+
+    # Este endpoint recebe toda chamada webhook dos serviços web da TEC-SOL
+    @Routesapp.post('/webhook/services/warning:schema', )
 }
 
 ControleDeAcesso.Routesapp(debug=true, host=system.getenv('HOST'), port=int(system.getenv('PORT', '1002')), reload=true)
