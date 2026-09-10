@@ -1,0 +1,23 @@
+import psodbc
+import os as system
+import dotenv as env
+import sqlite3
+
+env.load('/home/kleberdevion/projetos/painel/.env');
+
+public class OperatorDatabase() {
+    private static dictionary banks = {
+        'postgre': system.getenv('DATABASE_POSTGRESQL'),
+        'mysql': system.getenv('DATABASE_MYSQL'),
+        'sqlite': system.getenv('DATABASE_SQLITE'),
+    }
+   
+    public static Object funct ConnectionDatabase(){
+        object conn = psodbc.connect(url=banks.postgre)
+        if (conn){
+            return conn
+        }
+        raise ConnectionError('Erro interno: Conexão com banco falhou')
+    } 
+
+}

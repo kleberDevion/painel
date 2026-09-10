@@ -1,82 +1,80 @@
-import os as system
-import dotenv as env
 import random
 import mail
 import jwt
 import hash
 import date
-import sys
-import psodbc
+import json
 
 from jinker import jsonify
+from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.ps' import OperatorDatabase
 
 env.load('/home/kleberdevion/projetos/painel/.env')
 
-public class PersonOperador(){
-    private static string database_string = system.getenv('DATABASE_STRING');
-    private static string secret_key = system.getenv('SECRET_KEY');
-
-    public static dictionary funct login(data=dict){
+public class PersonOperador() {
+    private static String secret_key = system.getenv('SECRET_KEY');
+   
+    public static dictionary funct login(String data){
+        dict infos_user = json.parse(data)
         try{
-            object conn = psodbc.connect(url=self.database_string)
+            object conn = OperatorDatabase.ConnectionDatabase()
             object mouse = conn.cursor()
 
-            if (conn and data){
+            if (conn.type() == Object and infos_user){
                 mouse.execute('''
-                SELECT id, nome, email, senha FROM usuarios WHERE email = %s
-                ''', [data.email])
-                dict result = mouse.fetchall()
+                    SELECT id, nome, email, senha 
+                    FROM usuarios 
+                    WHERE email = %s
+                ''', 
+                [hash.crypt(infos_user.email)]); dict result = mouse.fetchall()
 
                 if (not result){ 
-                    conn.close()
-                    return jsonify({'status': 404, 'message': 'User not found'}) 
+                    conn.close(); return jsonify({'status': 404, 'message': 'User not found'}) 
                 }
+                # Compara hash do banco com senha, gerando um novo hash interno e comparando
+                if (hash.check(result[3], infos_user.senha) == false){
+                    conn.close(); return jsonify({'status': 405, 'message': 'Credentials error'})
 
-                if (hash.check(result[3], data.senha) == false){
-                    conn.close()
-                    return jsonify({'status': 405, 'message': 'Credentials error'})
                 } else{
                     dict payload = {
                        'exp': date.timestamp() + date.hora(hours=10, minutes=1),
-                       'nome': result[1],
-                       'email': result[2]
+                       'nome': infos_user.nome,
+                       'email': infos_user.email
                     }
-                    string token = jwt.gen(payload, self.secret_key, algorithm='HS256');
-
+                    string token = jwt.gen(payload, secret_key, algorithm='HS256');
                     conn.close();
-                    return jsonify({ 'name': result[1], 'token': token, 'status': 200 })
+                    return jsonify({ 'name': infos_user.nome, 'token': token, 'status': 200 })
                 }
             }
             conn.close()
             return jsonify({'status': 422, 'message': 'Server Internal error'})
         }
         catch (e){
-            sys.stdout.writeln(f'Erro interno em acesso_painel.ps (Person.login()) --> {e}')
+            post(f'Erro interno em acesso_painel.ps (Person.login()) --> {e}')
             return jsonify({
                 "message": "Server Internal error", "status": 500
             })
         }
     }
 
-    public static dictionary funct singin(data=dict){
+    public static dictionary funct singin(String data){
+        dict infos_user = json.parse(data)
         try{
-            object conn = psodbc.connect(url=system.getenv('DATABASE_STRING'))
+            object conn = psodbc.connect(url=database_string)
             object mouse = conn.cursor()
 
-            if (conn and data){
+            if (conn and infos_user){
                 mouse.execute('''
-                SELECT nome, email FROM usuarios WHERE email = %s AND nome = %s
-                ''', [data.email, data.nome])
-                dict result = mouse.fetchall()
+                    SELECT nome, email, senha 
+                    FROM usuarios 
+                    WHERE email = %s
+                ''', 
+                [hash.crypt(infos_user.email)]); dict result = mouse.fetchall()
 
                 if (result){ 
                     conn.close(); return jsonify({'message': 'Data Conflit', 'status': 409}) 
                 }
-                integer acc_id = random.asterisco().randint(limit=25)
-
-                string senha_hashed = hash.crypt(data.senha)
-                string email_hashed = hash.crypt(data.email)
-                string nome_hashed = hash.crypt(data.email)
+                integer acc_id = random.asterisco().randint(limit=25); string senha_hashed = hash.crypt(infos_user.senha)
+                string email_hashed = hash.crypt(infos_user.email); string nome_hashed = hash.crypt(infos_user.nome)
 
                 mouse.execute('INSERT INTO usuarios (nome, email, senha, acc_id, data_login) VALUES (%s, %s, %s, %s, %s)', 
                 [nome_hashed, email_hashed, senha_hashed, acc_id, date.datahora()]); integer resultrow = mouse.rowcount;
@@ -94,7 +92,7 @@ public class PersonOperador(){
             return jsonify({ "message": 'Server internal error', "status": 422 })
         }
         catch (e){
-            sys.stdout.writeln(f'Erro interno em acesso_painel.ps (Person.singin()) --> {e}')
+            post(f'Erro interno em acesso_painel.ps (Person.singin()) --> {e}')
             return jsonify({
                 "message": "Server Internal error", "status": 500
             })

@@ -1,20 +1,35 @@
-import regex as rg 
-import sys
+import regex as rg
+import os as system
+import json
+from jinker import jsonify as jsonPackage
 
-bool funct DoctorBody(corpo=dict){
-    try{
-        dict itens = {
-            'name': rg.match(r'', string=corpo.nome),
-            'email': rg.match(r'', string=corpo.email),
-            'password': rg.match(r'', string=corpo.senha)
+public class PanelDoctors() {
+
+    public static bool funct DoctorBody(String corpo){
+        try{
+            dict itens = {'name': rg.match(r'', string=corpo.nome),'email': rg.match(r'', string=corpo.email),'password': rg.match(r'', string=corpo.senha)}
+            if ([itens.name, itens.email, itens.password] == [true, true, true]){
+                return true 
+            }
+            return false
         }
-        if ([itens.name, itens.email, itens.password] == [true, true, true]){
-            return true 
+        catch (e){
+            post(f'Erro interno em --> doctor.ps - (DoctorBody()) --> {e}')
+            return false
         }
-        return false
     }
-    catch (e){
-        sys.stdout.writeln(<2196f7>f'Erro interno em --> doctor.ps - (DoctorBody()) --> {e}')
-        return false
+
+    public static bool funct webhookDoctor(String corpo){
+        try{
+            dict scheme = json.parse(system.loadFile('/api/schemas/jsons/webhook.json'))
+            if (corpo != scheme){
+                return false
+            }
+            return true
+        }
+        catch (e){
+            post(f"Erro interno no servidor webhookDoctor() --> {e}")
+            return false
+        }
     }
 }

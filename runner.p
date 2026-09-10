@@ -1,0 +1,5 @@
+from 'api/main.ps' import warningPanel
+import os as system
+
+if __name__ == 'main':
+    warningPanel.Routesapp(debug=true, host=system.getenv('HOST'), port=int(system.getenv('PORT', '1002')), reload=true);

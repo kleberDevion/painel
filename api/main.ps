@@ -6,13 +6,14 @@ import sys
 
 # Modelo de login.
 from '/home/kleberdevion/projetos/painel/api/schemas/models/login.ps' import RotaLoginPAINEL, RotaSinginPAINEL;
-from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.ps' import DoctorBody;
+from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.ps' import PanelDoctors
 from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import PersonOperador
+from '/home/kleberdevion/projetos/painel/api/service/controlWebhook.ps' import warnsInsertion
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
-public class ControleDeAcesso(){
-    public static object Routesapp = Jinker(__name__, 
+public class warningPanel(){
+    public static Object Routesapp = Jinker(__name__, 
         oauth={
             poolip: true, 
             rate: true, 
@@ -22,14 +23,14 @@ public class ControleDeAcesso(){
             key: '/home/kleberdevion/projetos/painel/api/tls/key.jinkerTls.key'
         }, route_prefix='/api/v7/painel/'
     );
-    private static object CrossOringin = cors(origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'])
+    private static Object CrossOrigin = cors(origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'])
 
 
     # Rota de login no painel
-    @Routesapp.post('/loginpanel:form', auth=CrossOringin.origins(), model=RotaLoginPAINEL)
-    static string funct handlerLogin(form){
+    @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=RotaLoginPAINEL)
+    public funct handlerLogin(self, String form){
         # Chamo o helper para validar o JSON
-        if (DoctorBody(form) == false){
+        if (PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
@@ -51,7 +52,8 @@ public class ControleDeAcesso(){
             }
             return JinkerResponse().json({'status': infos.status, 'message': infos.message})
         }
-        catch (e){
+        catch (e)
+        {
             sys.stdout.writeln(<2196f7>f'Erro interno no servidor em ( /loginpanel:form ) - {e}')
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
@@ -61,8 +63,8 @@ public class ControleDeAcesso(){
 
     # Criar conta de usuario
     @Routesapp.post('/sing-inpanel:form', model=RotaSinginPAINEL, auth=CrossOrigin.origins())
-    static string funct handlerSingin(form){
-        if (DoctorBody(form) == false){
+    public funct handlerSingin(self, form){
+        if (PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
@@ -76,8 +78,9 @@ public class ControleDeAcesso(){
             }
             return JinkerResponse().json({'status': infos.status, 'message': infos.message})
         }
-        catch (e){
-            sys.stdout.writeln(<2196f7>f'Erro interno no servidor em ( /sing-inpanel:form ) - {e}')
+        catch (e)
+        {
+            post(f'Erro interno no servidor em ( /sing-inpanel:form ) - {e}')
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 500, 'message': 'Server Internal Error'})
@@ -85,7 +88,22 @@ public class ControleDeAcesso(){
     }
 
     # Este endpoint recebe toda chamada webhook dos serviços web da TEC-SOL
-    @Routesapp.post('/webhook/services/warning:schema', )
+    @Routesapp.post('/webhook/services/warning:schema', auth=CrossOrigin.origins())
+    public funct handlerWebHook(self, String schema){
+        if (PanelDoctors.webhookDoctor(schema) == false){
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 400, 'message': 'Bad request'})
+        }
+        try{
+            
+        }
+        catch (e)
+        {
+            post(f"Erro interno no servidor em ( warningPanel().handlerWebhook() ) --> {e}");
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 500, 'message': 'Server Internal Error'})
+        }
+    }
 }
-
-ControleDeAcesso.Routesapp(debug=true, host=system.getenv('HOST'), port=int(system.getenv('PORT', '1002')), reload=true)
