@@ -1,13 +1,16 @@
 import regex as rg
 import os as system
 import json
-from jinker import jsonify as jsonPackage
 
 public class PanelDoctors() {
 
     public static bool funct DoctorBody(String corpo){
         try{
-            dict itens = {'name': rg.match(r'', string=corpo.nome),'email': rg.match(r'', string=corpo.email),'password': rg.match(r'', string=corpo.senha)}
+            dict itens = {'name': rg.match(r"/^[a-zA-Z]+(?: [a-zA-Z]+)*$/", 
+                corpo.nome),
+                'email': rg.match(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*$", 
+                corpo.email),'password': rg.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,30}$", corpo.senha)
+            }
             if ([itens.name, itens.email, itens.password] == [true, true, true]){
                 return true 
             }
@@ -19,7 +22,7 @@ public class PanelDoctors() {
         }
     }
 
-    public static bool funct webhookDoctor(String corpo){
+    public static bool funct webhookDoctor(dict corpo){
         try{
             dict scheme = json.parse(system.loadFile('/api/schemas/jsons/webhook.json'))
             if (corpo != scheme){
@@ -32,4 +35,5 @@ public class PanelDoctors() {
             return false
         }
     }
+
 }

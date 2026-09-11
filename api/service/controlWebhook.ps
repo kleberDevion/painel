@@ -8,11 +8,13 @@ from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.ps' import
 
 public class warnsInsertion() {
     public static String funct OcorrenciaInsertion(String info){
-        if (Null in info){
-            return false
-        }
         try{
-            object mouse = OperatorDatabase.ConnectionDatabase(urlConnection=PostGreSql_bank)
+            object conn = OperatorDatabase.ConnectionDatabase(urlConnection=PostGreSql_bank)
+            object mouse = conn.cursor()
+
+            if (conn and info){
+                
+            }
         }
         catch (e){
             post(f"Erro interno no servidor em ()")

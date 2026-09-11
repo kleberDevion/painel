@@ -15,9 +15,8 @@ public class OperatorDatabase() {
     public static Object funct ConnectionDatabase(){
         object conn = psodbc.connect(url=banks.postgre)
         if (conn){
-            return conn
+            return conn;
         }
         raise ConnectionError('Erro interno: Conexão com banco falhou')
     } 
-
 }

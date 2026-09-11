@@ -28,7 +28,7 @@ public class warningPanel(){
 
     # Rota de login no painel
     @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=RotaLoginPAINEL)
-    public funct handlerLogin(self, String form){
+    public funct handlerLogin(self, dict form){
         # Chamo o helper para validar o JSON
         if (PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
@@ -63,7 +63,7 @@ public class warningPanel(){
 
     # Criar conta de usuario
     @Routesapp.post('/sing-inpanel:form', model=RotaSinginPAINEL, auth=CrossOrigin.origins())
-    public funct handlerSingin(self, form){
+    public funct handlerSingin(self, dict form){
         if (PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
@@ -89,7 +89,7 @@ public class warningPanel(){
 
     # Este endpoint recebe toda chamada webhook dos serviços web da TEC-SOL
     @Routesapp.post('/webhook/services/warning:schema', auth=CrossOrigin.origins())
-    public funct handlerWebHook(self, String schema){
+    public funct handlerWebHook(self, dict schema){
         if (PanelDoctors.webhookDoctor(schema) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
