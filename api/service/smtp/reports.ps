@@ -1,0 +1,73 @@
+import mail
+import os as environment
+import date 
+
+public class SmtpReports() {
+    private static String subject = "ServerPanelError- Tecsol Engenharia";
+    private static String recepter = environment.getenv('SMTP_TO_REPORTS');
+    private static String sender = environment.getenv('SMTP_FROM_REPORTS');
+   
+    public static String funct reportInsertionOk(String body){
+        try{
+            string bodyFormat = body.raplace(['CONTENT', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], 
+                body.info.type_error, 
+                body.info.data_ocorrencia, 
+                body.info.nome_servico, 
+                body.info.id_transition
+            );
+            object smtp = mail.MailMessage()
+                   .from_address(sender)
+                   .to(recepter)
+                   .subject(subject)
+                   .body(bodyFormat, is_html=true)
+
+            object smtpClient = mail.MailServer()
+                   .conn('smtp.gmail.com', 587, tls=true)
+                   .login(environment.getenv('SMTP_PASSWORD_REPORTS'), sender)
+
+            if (smtpClient and smtp){
+                smtpClient.send(smtp)
+                smtpClient.quit()
+                return Null,'1'
+            }
+            return Null,'2'
+           
+        }
+        catch (Exception e){
+            post(f"Erro interno no servidor em ( SmtpReports().sendMail() ) --> {e}");
+            return Null,'3'
+        }
+    }
+
+    public static String funct reportInsertionFalse(String body){
+        try{
+            string bodyFormat = body.raplace(['CONTENT', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], 
+                body.info.type_error, 
+                body.info.data_ocorrencia, 
+                body.info.nome_servico, 
+                body.info.id_transition
+            );
+            object smtp = mail.MailMessage()
+                   .from_address(sender)
+                   .to(recepter)
+                   .subject(subject)
+                   .body(bodyFormat, is_html=true)
+
+            object smtpClient = mail.MailServer()
+                   .conn('smtp.gmail.com', 587, tls=true)
+                   .login(environment.getenv('SMTP_PASSWORD_REPORTS'), sender)
+
+            if (smtpClient and smtp){
+                smtpClient.send(smtp)
+                smtpClient.quit()
+                return Null,'1'
+            }
+            return Null,'2'
+           
+        }
+        catch (Exception e){
+            post(f"Erro interno no servidor em ( SmtpReports().sendMail() ) --> {e}");
+            return Null,'3'
+        }
+    }
+}

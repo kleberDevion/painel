@@ -30,7 +30,7 @@ public class warningPanel(){
     @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=RotaLoginPAINEL)
     public funct handlerLogin(self, dict form){
         # Chamo o helper para validar o JSON
-        if (PanelDoctors.DoctorBody(form) == false){
+        if (!PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
@@ -52,7 +52,7 @@ public class warningPanel(){
             }
             return JinkerResponse().json({'status': infos.status, 'message': infos.message})
         }
-        catch (e)
+        catch (Exception e)
         {
             sys.stdout.writeln(<2196f7>f'Erro interno no servidor em ( /loginpanel:form ) - {e}')
             return JinkerResponse()
@@ -64,7 +64,7 @@ public class warningPanel(){
     # Criar conta de usuario
     @Routesapp.post('/sing-inpanel:form', model=RotaSinginPAINEL, auth=CrossOrigin.origins())
     public funct handlerSingin(self, dict form){
-        if (PanelDoctors.DoctorBody(form) == false){
+        if (!PanelDoctors.DoctorBody(form)){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
@@ -78,7 +78,7 @@ public class warningPanel(){
             }
             return JinkerResponse().json({'status': infos.status, 'message': infos.message})
         }
-        catch (e)
+        catch (Exception e)
         {
             post(f'Erro interno no servidor em ( /sing-inpanel:form ) - {e}')
             return JinkerResponse()
@@ -90,17 +90,50 @@ public class warningPanel(){
     # Este endpoint recebe toda chamada webhook dos serviços web da TEC-SOL
     @Routesapp.post('/webhook/services/warning:schema', auth=CrossOrigin.origins())
     public funct handlerWebHook(self, dict schema){
-        if (PanelDoctors.webhookDoctor(schema) == false){
+        if (!PanelDoctors.webhookDoctor(schema)){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
         }
         try{
-            
+            if (request.headers.get('Authorization') != system.getenv('WEBHOOK_AUTHORIZATION')){
+                return JinkerResponse()
+                       .header('Content-Type', 'application/json')
+                       .json({'status': 403, 'message': 'Forbidden'})
+            }
+            return warnsInsertion.OcorrenciaInsertion(info=schema)
         }
-        catch (e)
+        catch (Exception e)
         {
             post(f"Erro interno no servidor em ( warningPanel().handlerWebhook() ) --> {e}");
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 500, 'message': 'Server Internal Error'})
+        }
+    }
+
+    @Routesapp.get('/ocorrencias:data', auth=CrossOrigin.origins())
+    public static String funct handlerGetOcorrencias(self, dict data){
+        try{
+            if (request.headers.get('Authorization') != system.getenv('WEBHOOK_AUTHORIZATION')){
+                return JinkerResponse()
+                       .header('Content-Type', 'application/json')
+                       .json({'status': 403, 'message': 'Forbidden'})
+            }
+            if (data){
+                return OperatorDatabase.GetOcorrencias(data)
+            }elif (not data)
+            {
+                return OperatorDatabase.GetAllOcorrencias()
+            }else{
+                return JinkerResponse()
+                       .header('Content-Type', 'application/json')
+                       .json({'status': 400, 'message': 'Bad request'})
+            }
+        }
+        catch (Exception e)
+        {
+            post(f"Erro interno no servidor em ( warningPanel().handlerGetOcorrencias() ) --> {e}");
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 500, 'message': 'Server Internal Error'})

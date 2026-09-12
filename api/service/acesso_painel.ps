@@ -48,7 +48,7 @@ public class PersonOperador() {
             conn.close()
             return jsonify({'status': 422, 'message': 'Server Internal error'})
         }
-        catch (e){
+        catch (Exception e){
             post(f'Erro interno em acesso_painel.ps (Person.login()) --> {e}')
             return jsonify({
                 "message": "Server Internal error", "status": 500
@@ -76,7 +76,10 @@ public class PersonOperador() {
                 integer acc_id = random.asterisco().randint(limit=25); string senha_hashed = hash.crypt(infos_user.senha)
                 string email_hashed = hash.crypt(infos_user.email); string nome_hashed = hash.crypt(infos_user.nome)
 
-                mouse.execute('INSERT INTO usuarios (nome, email, senha, acc_id, data_login) VALUES (%s, %s, %s, %s, %s)', 
+                mouse.execute(''' 
+                    INSERT INTO 
+                        usuarios (nome, email, senha, acc_id, data_login)
+                    VALUES (%s, %s, %s, %s, %s)''', 
                 [nome_hashed, email_hashed, senha_hashed, acc_id, date.datahora()]); integer resultrow = mouse.rowcount;
 
                 if (resultrow > 0){
@@ -91,7 +94,7 @@ public class PersonOperador() {
             conn.close()
             return jsonify({ "message": 'Server internal error', "status": 422 })
         }
-        catch (e){
+        catch (Exception e){
             post(f'Erro interno em acesso_painel.ps (Person.singin()) --> {e}')
             return jsonify({
                 "message": "Server Internal error", "status": 500

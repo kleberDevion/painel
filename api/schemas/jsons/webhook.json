@@ -1,11 +1,10 @@
 {
     "$schema": {
-        "appName": "string",
-        "appId": 100,
         "infos": {
-            "date": "string",
-            "typeError": "string",
-            "status_code": 100
+            "data_ocorrencia": "string",
+            "type_error": "string",
+            "status_code": 100,
+            "nome_servico": "string"
         },
         "idTransition": "string"
     }

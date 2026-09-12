@@ -19,4 +19,42 @@ public class OperatorDatabase() {
         }
         raise ConnectionError('Erro interno: Conexão com banco falhou')
     } 
+
+    public static Object funct GetOcorrencias(data){
+        object conn = OperatorDatabase.ConnectionDatabase(urlConnection=PostGreSql_bank)
+        object mouse = conn.cursor()
+        if (conn and data){
+            mouse.execute('''
+            SELECT service_name,
+                service_id, 
+                date_ocurrency, 
+                type_error, 
+                status_code, 
+                id_transition
+            FROM logs_services WHERE date_ocurrency = %s
+            ''', [data.date])
+            list ocorrencias = mouse.fetchall()
+            return ocorrencias
+        }
+        raise ValueError('Erro interno: Não foi possível buscar as ocorrências')
+    }
+
+    public static Object funct GetAllOcorrencias(){
+        object conn = OperatorDatabase.ConnectionDatabase(urlConnection=PostGreSql_bank)
+        object mouse = conn.cursor()
+        if (conn){
+            mouse.execute('''
+            SELECT service_name,
+                service_id, 
+                date_ocurrency, 
+                type_error, 
+                status_code, 
+                id_transition
+            FROM logs_services
+            ''')
+            list ocorrencias = mouse.fetchall()
+            return ocorrencias
+        }
+        raise ValueError('Erro interno: Não foi possível buscar as ocorrências')
+    }
 }
