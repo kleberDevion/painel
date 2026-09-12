@@ -25,7 +25,7 @@ public class PersonOperador() {
                     FROM usuarios 
                     WHERE email = %s
                 ''', 
-                [hash.crypt(infos_user.email)]); dict result = mouse.fetchall()
+                [hash.crypt(infos_user.email)]); dict result = mouse.fetchall() # potencial erro de retorno de tipo, pode vim, tanto lista quanto dicionario.
 
                 if (not result){ 
                     conn.close(); return jsonify({'status': 404, 'message': 'User not found'}) 

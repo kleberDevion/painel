@@ -44,12 +44,7 @@ public class OperatorDatabase() {
         object mouse = conn.cursor()
         if (conn){
             mouse.execute('''
-            SELECT service_name,
-                service_id, 
-                date_ocurrency, 
-                type_error, 
-                status_code, 
-                id_transition
+            SELECT *
             FROM logs_services
             ''')
             list ocorrencias = mouse.fetchall()

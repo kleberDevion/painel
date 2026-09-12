@@ -1,4 +1,4 @@
-from jinker import Jinker, JinkerRequest, JinkerResponse, cors
+from jinker import Jinker, JinkerRequest, JinkerResponse, cors, request
 
 import os as system
 import dotenv as env
@@ -9,6 +9,7 @@ from '/home/kleberdevion/projetos/painel/api/schemas/models/login.ps' import Rot
 from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.ps' import PanelDoctors
 from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import PersonOperador
 from '/home/kleberdevion/projetos/painel/api/service/controlWebhook.ps' import warnsInsertion
+from '/home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.ps' import UNTILS
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
@@ -96,7 +97,7 @@ public class warningPanel(){
                    .json({'status': 400, 'message': 'Bad request'})
         }
         try{
-            if (request.headers.get('Authorization') != system.getenv('WEBHOOK_AUTHORIZATION')){
+            if (UNTILS.getTokensWebhook(request.headers.get('Authorization') == False)){
                 return JinkerResponse()
                        .header('Content-Type', 'application/json')
                        .json({'status': 403, 'message': 'Forbidden'})
