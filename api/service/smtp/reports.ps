@@ -1,34 +1,40 @@
 import mail
 import os as environment
-import date 
+import date
+import json
+
+import '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.ps'
 
 public class SmtpReports() {
-    private static String subject = "ServerPanelError - Tecsol Engenharia";
-    private static String recepter = environment.getenv('SMTP_TO_REPORTS');
-    private static String sender = environment.getenv('SMTP_FROM_REPORTS');
+    public static String subject = "ServerPanelError - Tecsol Engenharia";
+    public static String recepter = environment.getenv('SMTP_TO_REPORTS');
+    public static String sender = environment.getenv('SMTP_FROM_REPORTS');
+    public static String password = environment.getenv('SMTP_PASSWORD_REPORTS');
+    # Corpo HTML enviado nos avisos.
+    public static String body_html = environment.loadFile('/home/kleberdevion/projetos/painel/api/service/templates/REPORT_BODY.html');
    
-    public static String funct reportInsertionOk(String body){
+    # info e o dict que e passado com os registros de erro dos serviços
+    @StateAnalise.statefunct
+    public static String funct reportInsertionOk(dict info_error){
+        dict inf = json.parse(info_error)
         try{
-            string bodyFormat = body.raplace(['CONTENT', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], 
-                body.info.type_error, 
-                body.info.data_ocorrencia, 
-                body.info.nome_servico, 
-                body.info.id_transition
-            );
+            string bodyFormat = self.body_html.raplace(['ERROR_TYPE', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], [
+                inf.info.type_error, inf.info.data_ocorrencia, 
+                inf.info.nome_servico, inf.info.id_transition
+            ]);
             object smtp = mail.MailMessage()
-                   .from_address(sender)
-                   .to(recepter)
-                   .subject(subject)
-                   .body(bodyFormat, is_html=true)
+            .from_address(sender)
+            .to(self.recepter)
+            .subject(subject)
+            .body(bodyFormat, is_html=true)
 
             object smtpClient = mail.MailServer()
-                   .conn('smtp.gmail.com', 587, tls=true)
-                   .login(environment.getenv('SMTP_PASSWORD_REPORTS'), sender)
+            .conn('smtp.gmail.com', 587, tls=true)
+            .login(self.password, sender)
 
             if (smtpClient and smtp){
-                smtpClient.send(smtp)
-                smtpClient.quit()
-                return Null,'1'
+                smtpClient.send(smtp); smtpClient.quit()
+                return Null,'1' # Numeração para debug de forma eficiente (para mim e eficiente pois sei o pq do erro, na maioria das vezes e o motor da lang, não o codigo, ai vou e corrijo)
             }
             return Null,'2'
            
@@ -39,27 +45,26 @@ public class SmtpReports() {
         }
     }
 
-    public static String funct reportInsertionFalse(String body){
+    @StateAnalise.statefunct
+    public static String funct reportInsertionFalse(dict info_error){
+        dict inf = json.parse(info_error)
         try{
-            string bodyFormat = body.raplace(['CONTENT', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], 
-                body.info.type_error, 
-                body.info.data_ocorrencia, 
-                body.info.nome_servico, 
-                body.info.id_transition
-            );
+            string bodyFormat = self.body_html.raplace(['ERROR_TYPE', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], [
+                inf.info.type_error, inf.info.data_ocorrencia, 
+                inf.info.nome_servico, inf.info.id_transition
+            ]);
             object smtp = mail.MailMessage()
-                   .from_address(sender)
-                   .to(recepter)
-                   .subject(subject)
-                   .body(bodyFormat, is_html=true)
+            .from_address(sender)
+            .to(recepter)
+            .subject(subject)
+            .body(bodyFormat, is_html=true)
 
             object smtpClient = mail.MailServer()
-                   .conn('smtp.gmail.com', 587, tls=true)
-                   .login(environment.getenv('SMTP_PASSWORD_REPORTS'), sender)
+            .conn('smtp.gmail.com', 587, tls=true)
+            .login(environment.getenv('SMTP_PASSWORD_REPORTS'), sender)
 
             if (smtpClient and smtp){
-                smtpClient.send(smtp)
-                smtpClient.quit()
+                smtpClient.send(smtp); smtpClient.quit()
                 return Null,'1'
             }
             return Null,'2'

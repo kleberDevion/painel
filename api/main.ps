@@ -10,11 +10,14 @@ from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.ps' import P
 from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import PersonOperador
 from '/home/kleberdevion/projetos/painel/api/service/controlWebhook.ps' import warnsInsertion
 from '/home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.ps' import UNTILS
+from '/home/kleberdevion/projetos/painel/api/service/decorators/login.ps' import schemaLogin
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
 public class warningPanel(){
-    public static Object Routesapp = Jinker(__name__, 
+    #private static list dns = system.getenv('DOMAINS')
+    # Routesapp não carrega __name__ pois não e este aqruivo que executa como main
+    public static Object Routesapp = Jinker( 
         oauth={
             poolip: true, 
             rate: true, 
@@ -25,19 +28,35 @@ public class warningPanel(){
         }, route_prefix='/api/v7/painel/'
     );
     private static Object CrossOrigin = cors(origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'])
+    # MIDDLEWARE PARA AUTENTICAÇÃO DE TOKEN WEBHOOK
+    @Routesapp.middleware()
+    public funct middle(self){
+        dict headers = request.header(key='Authorization')
+        if (UNTILS.getTokensWebhook(headers) == false){
+            return JinkerResponse()
+                   .header('Content-Type', 'application/json')
+                   .json({'status': 403, 'message': 'Forbidden'})
+        }
+    }
 
+    # Rota de teste para verificar se o servidor está online
+    @Routesapp.get('/', auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
+    public funct healthcheck(self){
+        return JinkerResponse()
+               .header('Content-Type', 'application/json')
+               .json({'status': 200, 'message': 'Vai se fuder'})
+    }
 
     # Rota de login no painel
-    @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=RotaLoginPAINEL)
+    @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=RotaLoginPAINEL, middleware=Routesapp.middleware)
     public funct handlerLogin(self, dict form){
-        # Chamo o helper para validar o JSON
         if (!PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 400, 'message': 'Bad request'})
         }
         try{
-            dict infos = PersonOperador.login(form)
+            dict infos = PersonOperador.login(data=form)
             if (infos.status == 200){
                 return JinkerResponse()
                        .json({'message': 'Login feito!', 'status': infos.status, 'userName': infos.name})
@@ -49,7 +68,7 @@ public class warningPanel(){
                             httponly=true, 
                             secure=true,
                             domain=system.getenv('DOMAINS')
-                       ); # Assino o token com id de sessão
+                       ); # Assina o token com id de sessão
             }
             return JinkerResponse().json({'status': infos.status, 'message': infos.message})
         }
@@ -63,7 +82,7 @@ public class warningPanel(){
     }
 
     # Criar conta de usuario
-    @Routesapp.post('/sing-inpanel:form', model=RotaSinginPAINEL, auth=CrossOrigin.origins())
+    @Routesapp.post('/sing-inpanel', model=RotaSinginPAINEL, auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
     public funct handlerSingin(self, dict form){
         if (!PanelDoctors.DoctorBody(form)){
             return JinkerResponse()
@@ -71,7 +90,7 @@ public class warningPanel(){
                    .json({'status': 400, 'message': 'Bad request'})
         }
         try{
-            dict infos = PersonOperador.singin(form)
+            dict infos = PersonOperador.singin(data=form)
             if (infos.status == 201){
                 return JinkerResponse()
                        .header('Content-Type', 'application/json')
@@ -89,7 +108,7 @@ public class warningPanel(){
     }
 
     # Este endpoint recebe toda chamada webhook dos serviços web da TEC-SOL
-    @Routesapp.post('/webhook/services/warning:schema', auth=CrossOrigin.origins())
+    @Routesapp.post('/webhook/services/warning:schema', auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
     public funct handlerWebHook(self, dict schema){
         if (!PanelDoctors.webhookDoctor(schema)){
             return JinkerResponse()
@@ -113,8 +132,9 @@ public class warningPanel(){
         }
     }
 
-    @Routesapp.get('/ocorrencias:data', auth=CrossOrigin.origins())
-    public static String funct handlerGetOcorrencias(self, dict data){
+    # Endpoint para buscar ocorrencias de erro dos serviços web da TEC-SOL
+    @Routesapp.get('/ocorrencias:data', auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
+    public String funct handlerGetOcorrencias(self, dict data){
         try{
             if (request.headers.get('Authorization') != system.getenv('WEBHOOK_AUTHORIZATION')){
                 return JinkerResponse()
@@ -123,10 +143,11 @@ public class warningPanel(){
             }
             if (data){
                 return OperatorDatabase.GetOcorrencias(data)
-            }elif (not data)
-            {
+            }
+            elif (not data){
                 return OperatorDatabase.GetAllOcorrencias()
-            }else{
+            }
+            else{
                 return JinkerResponse()
                        .header('Content-Type', 'application/json')
                        .json({'status': 400, 'message': 'Bad request'})

@@ -8,9 +8,9 @@ from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.ps' import
 from '/home/kleberdevion/projetos/painel/api/service/smtp/reports.ps' import SmtpReports
 
 public class warnsInsertion() {
-    public static String funct OcorrenciaInsertion(String info){
+    public static String funct OcorrenciaInsertion(dict info){
         try{
-            object conn = OperatorDatabase.ConnectionDatabase(urlConnection=PostGreSql_bank)
+            object conn = OperatorDatabase.ConnectionDatabase()
             object mouse = conn.cursor()
 
             # Inserir ocorrencias de erro dos serviços no banco

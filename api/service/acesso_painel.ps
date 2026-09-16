@@ -4,6 +4,8 @@ import jwt
 import hash
 import date
 import json
+import dotenv as env
+import os as system
 
 from jinker import jsonify
 from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.ps' import OperatorDatabase
@@ -13,8 +15,8 @@ env.load('/home/kleberdevion/projetos/painel/.env')
 public class PersonOperador() {
     private static String secret_key = system.getenv('SECRET_KEY');
    
-    public static dictionary funct login(String data){
-        dict infos_user = json.parse(data)
+    public static dictionary funct login(dict data){
+        dict infos_user = json.parse(data) # parseia pra dict PoolScript
         try{
             object conn = OperatorDatabase.ConnectionDatabase()
             object mouse = conn.cursor()
@@ -56,10 +58,10 @@ public class PersonOperador() {
         }
     }
 
-    public static dictionary funct singin(String data){
+    public static dictionary funct singin(dict data){
         dict infos_user = json.parse(data)
         try{
-            object conn = psodbc.connect(url=database_string)
+            object conn = OperatorDatabase.ConnectionDatabase()
             object mouse = conn.cursor()
 
             if (conn and infos_user){

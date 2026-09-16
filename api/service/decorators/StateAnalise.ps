@@ -1,0 +1,15 @@
+
+
+# Verifica se os arg de uma funct estão nulos.
+funct statefunct(func){
+    funct wrapper(body, *args, **kwargs){
+        if (body is Null){
+            raise ValueError(f'Função de callback esta com valor nulo')
+        }
+        pass
+    }
+    return wrapper
+}
+
+
+
