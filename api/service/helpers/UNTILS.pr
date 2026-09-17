@@ -1,23 +1,21 @@
 import os as system
 import dotenv as env
-
-
+import psodbc
 
 public class UNTILS() {
-    public static String funct getTokensWebhook(String token){
+    private static String urlConnection = system.getenv('DATABASE_TOKENS_WEBHOOK')
+
+    public static funct getTokensWebhook(dict token){
         try{
             env.load('/home/kleberdevion/projetos/painel/.env');
-            string urlConnection = system.getenv('DATABASE_TOKENS_WEBHOOK')
             object conn = psodbc.connect(url=urlConnection)
             object mouse = conn.cursor()
             if (conn){
                 mouse.execute('''
                 SELECT token FROM tokens_webhook WHERE token_name = ?
                 ''', [token.token_name])
-                list token = mouse.fetchall()
-                if (token){
-                    return True
-                }
+                list result = mouse.fetchall()
+                if (result){ return True }
                 return False
             }
             raise ValueError('Erro interno: Não foi possível buscar os tokens do webhook')

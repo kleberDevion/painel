@@ -17,14 +17,14 @@ public class warnsInsertion() {
             if (conn and info){
                 mouse.execute('''
                 INSERT INTO logs_services (
-                       service_name,
-                       service_id, 
-                       date_ocurrency, 
-                       type_error, 
-                       status_code, 
-                       id_transition
+                    service_name, service_id, date_ocurrency, 
+                    type_error, status_code, id_transition
                 ) VALUES (%s, %s, %s, %s, %s, %s)
-                ''', []); Integer InsertionResult = mouse.rowcount
+                ''', [
+                    info.service_name, info.service_id, 
+                    info.date_ocurrency, info.type_error, 
+                    info.status_code, info.id_transition
+                ]); Integer InsertionResult = mouse.rowcount
                 if InsertionResult > 0{
                     SmtpReports.reportInsertionOk(info)
                     return jsonify({'status': 200, 'message': 'Ocorrência inserida com sucesso!'})

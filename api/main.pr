@@ -24,15 +24,15 @@ public class warningPanel(){
             rate: true, 
             tls: true, 
             bloq: 200, 
-            cert: '/home/kleberdevion/projetos/painel/api/tls/certificate.jinkerTls', 
-            key: '/home/kleberdevion/projetos/painel/api/tls/key.jinkerTls.key'
-        }, route_prefix='/api/v7/painel/'
+            cert: '/home/kleberdevion/projetos/painel/api/service/.config/certificate.jinkerTls', 
+            key: '/home/kleberdevion/projetos/painel/api/service/.config/key.jinkerTls.key'
+        }, route_prefix='/api/v1/painel/'
     );
     private static Object CrossOrigin = cors(origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'])
     # MIDDLEWARE PARA AUTENTICAÇÃO DE TOKEN WEBHOOK
     @Routesapp.middleware()
     public funct middle(self){
-        str headers = request.header(key='Authorization')
+        dict headers = request.headers.get(key='Authorization')
         if (UNTILS.getTokensWebhook(headers) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
@@ -117,7 +117,7 @@ public class warningPanel(){
                    .json({'status': 400, 'message': 'Bad request'})
         }
         try{
-            if (UNTILS.getTokensWebhook(request.headers.get('Authorization') == False)){
+            if (UNTILS.getTokensWebhook(request.headers.get('Authorization')) == False){
                 return JinkerResponse()
                        .header('Content-Type', 'application/json')
                        .json({'status': 403, 'message': 'Forbidden'})
@@ -137,7 +137,7 @@ public class warningPanel(){
     @Routesapp.get('/ocorrencias:data', auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
     public funct handlerGetOcorrencias(self, dict data){
         try{
-            if (request.headers.get('Authorization') != system.getenv('WEBHOOK_AUTHORIZATION')){
+            if (UNTILS.getTokensWebhook(request.headers.get('Authorization')) == False){
                 return JinkerResponse()
                        .header('Content-Type', 'application/json')
                        .json({'status': 403, 'message': 'Forbidden'})

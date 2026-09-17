@@ -7,7 +7,7 @@ PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr'
 
 enviroment.load('/home/kleberdevion/projetos/painel/.env');
 
-class Compose(){
+public class Compose(){
     private static String subject = "RELATORIO MENSAL <--> SERVIÇOS TECSOL ENGENHARIA";
     private static String recepter = system.getenv('SMTP_TO_REPORTS');
     private static String sender = system.getenv('SMTP_FROM_REPORTS');
@@ -17,7 +17,7 @@ class Compose(){
 
     @statefunct
     public static funct relatorySender(dict bodyCompose=OperatorDatabase.RelatorioMensalHelper()){
-        String compose_divs = str(
+        string compose_divs = str(
             system.loadFile('/home/kleberdevion/projetos/painel/api/service/templates/relatorio_mes.html')
         ).replace(['INTERNAL_ERROR','HOUR_TAX','SERVICE_1','SERVICE_2','SERVICE_3','ID'], [bodyCompose.amount_internalsErrors,bodyCompose.hour_tax_errors,bodyCompose.services.crm,bodyCompose.services.psp,bodyCompose.services.tp,id_relatorio]);
         try{

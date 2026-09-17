@@ -4,7 +4,7 @@ import json
 
 public class PanelDoctors() {
 
-    public static bool funct DoctorBody(String corpo){
+    public static funct DoctorBody(dict corpo){
         try{
             dict itens = {'name': rg.match(r"/^[a-zA-Z]+(?: [a-zA-Z]+)*$/", 
                 corpo.nome),
@@ -22,7 +22,7 @@ public class PanelDoctors() {
         }
     }
 
-    public static bool funct webhookDoctor(dict corpo){
+    public static funct webhookDoctor(dict corpo){
         try{
             dict scheme = json.parse(system.loadFile('/api/schemas/jsons/webhook.json'))
             if (corpo != scheme){
