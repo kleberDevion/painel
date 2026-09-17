@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS logs_services (
     date_ocurrency TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     type_error TEXT,
     status_code INTEGER,
-    id_transition TEXT
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_transition TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

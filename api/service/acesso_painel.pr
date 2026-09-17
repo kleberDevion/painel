@@ -8,14 +8,14 @@ import dotenv as env
 import os as system
 
 from jinker import jsonify
-from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.ps' import OperatorDatabase
+from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import OperatorDatabase
 
 env.load('/home/kleberdevion/projetos/painel/.env')
 
 public class PersonOperador() {
     private static String secret_key = system.getenv('SECRET_KEY');
    
-    public static dictionary funct login(dict data){
+    public static funct login(dict data){
         dict infos_user = json.parse(data) # parseia pra dict PoolScript
         try{
             object conn = OperatorDatabase.ConnectionDatabase()
@@ -58,7 +58,7 @@ public class PersonOperador() {
         }
     }
 
-    public static dictionary funct singin(dict data){
+    public static funct singin(dict data){
         dict infos_user = json.parse(data)
         try{
             object conn = OperatorDatabase.ConnectionDatabase()

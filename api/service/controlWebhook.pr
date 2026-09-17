@@ -4,11 +4,11 @@ import dotenv as env
 import json
 
 from jinker import jsonify
-from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.ps' import OperatorDatabase
-from '/home/kleberdevion/projetos/painel/api/service/smtp/reports.ps' import SmtpReports
+from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import OperatorDatabase
+from '/home/kleberdevion/projetos/painel/api/service/smtp/reports.pr' import SmtpReports
 
 public class warnsInsertion() {
-    public static String funct OcorrenciaInsertion(dict info){
+    public static funct OcorrenciaInsertion(dict info){
         try{
             object conn = OperatorDatabase.ConnectionDatabase()
             object mouse = conn.cursor()

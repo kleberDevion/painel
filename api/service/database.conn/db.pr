@@ -1,0 +1,104 @@
+import psodbc
+import os as system
+import dotenv as env
+import sqlite3
+
+import poolscript.libs.pagination
+
+PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' GET *
+
+env.load('/home/kleberdevion/projetos/painel/.env');
+
+public class OperatorDatabase() {
+    private static dictionary banks = {
+        'postgre': system.getenv('DATABASE_POSTGRESQL'),
+        'mysql': system.getenv('DATABASE_MYSQL'),
+        'sqlite': system.getenv('DATABASE_SQLITE'),
+    }
+   
+    public static funct ConnectionDatabase(){
+        object conn = psodbc.connect(banks['postgre'])
+        if (conn){
+            return conn;
+        }
+        raise Exception('Erro interno: Conexão com banco falhou')
+    }
+
+    @statefunct
+    public static funct GetOcorrencias(dict data){
+        object conn = OperatorDatabase.ConnectionDatabase()
+        object mouse = conn.cursor()
+        if (conn and data){
+            mouse.execute('''
+            SELECT service_name,
+                service_id, 
+                date_ocurrency, 
+                type_error, 
+                status_code, 
+                id_transition
+            FROM logs_services WHERE date_ocurrency = %s
+            ''', [data.date_ocurrency])
+            dict ocorrencias = mouse.fetchall()
+            return ocorrencias
+        }
+        raise Exception('Erro interno em (OperatorDatabase.GetOcorrencias())')
+    }
+
+    # Depois irei terminar de criar a lib de paginação, e irei importar e utilizar aqui nesta funct.
+    public static funct GetAllOcorrencias(){
+        object conn = pagination.page() # realizar a paginação
+        object mouse = conn.cursor()
+        if (conn){
+            mouse.execute('''
+            SELECT *
+            FROM logs_services
+            ''')
+            dict ocorrencias = mouse.fetchall()
+            return ocorrencias
+        }
+        raise Exception('Erro interno em (OperatorDatabase.GetAllOcorrencias())')
+    }
+
+    public static dict funct RelatorioMensalHelper(){
+        object conn = OperatorDatabase.ConnectionDatabase()
+        object mouse = conn.cursor()
+        if (conn){
+            mouse.execute('''
+            select count(*) as total 
+            from "logs_services"
+            WHERE type_error = 'internal';
+            '''); dict amount_internalsErrors = mouse.fetchall();
+
+            mouse.execute('''
+            select date_trunc('hour', date_ocurrency) as hour_slot,
+                COUNT(*) as count
+            from logs_services
+            where type_error = 'internal'
+            group by 1
+            order by 2 desc
+            limit 1;   
+            '''); dict hour_tax_errors = mouse.fetchall();
+
+            mouse.execute('''
+            select service_name,
+                COUNT(*) as count
+            from logs_services
+            where type_error = 'internal'
+            and service_name in ('crm', 'psp', 'tp')
+            group by service_name
+            order by 2 desc;   
+            '''); dict sepair_services = mouse.fetchall()
+
+            dict __items = {
+                'amount_internalsErrors': amount_internalsErrors,
+                'hour_tax_errors':  hour_tax_errors,
+                'services': {
+                    'crm': sepair_services.crm,
+                    'psp': sepair_services.psp,
+                    'tp': sepair_services.tp
+                }
+            }; return __items
+        }
+        raise Exception('Erro interno em (OperatorDatabase.RelatorioMensalHelper())')
+    }
+}

@@ -5,12 +5,13 @@ import dotenv as env
 import sys
 
 # Modelo de login.
-from '/home/kleberdevion/projetos/painel/api/schemas/models/login.ps' import RotaLoginPAINEL, RotaSinginPAINEL;
-from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.ps' import PanelDoctors
-from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.ps' import PersonOperador
-from '/home/kleberdevion/projetos/painel/api/service/controlWebhook.ps' import warnsInsertion
-from '/home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.ps' import UNTILS
-from '/home/kleberdevion/projetos/painel/api/service/decorators/login.ps' import schemaLogin
+from '/home/kleberdevion/projetos/painel/api/schemas/models/login.pr' import RotaLoginPAINEL, RotaSinginPAINEL;
+from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.pr' import PanelDoctors
+from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.pr' import PersonOperador
+from '/home/kleberdevion/projetos/painel/api/service/controlWebhook.pr' import warnsInsertion
+from '/home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.pr' import UNTILS
+from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import *
+#from '/home/kleberdevion/projetos/painel/api/service/decorators/login.pr' import schemaLogin
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
@@ -31,7 +32,7 @@ public class warningPanel(){
     # MIDDLEWARE PARA AUTENTICAÇÃO DE TOKEN WEBHOOK
     @Routesapp.middleware()
     public funct middle(self){
-        dict headers = request.header(key='Authorization')
+        str headers = request.header(key='Authorization')
         if (UNTILS.getTokensWebhook(headers) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
@@ -134,7 +135,7 @@ public class warningPanel(){
 
     # Endpoint para buscar ocorrencias de erro dos serviços web da TEC-SOL
     @Routesapp.get('/ocorrencias:data', auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
-    public String funct handlerGetOcorrencias(self, dict data){
+    public funct handlerGetOcorrencias(self, dict data){
         try{
             if (request.headers.get('Authorization') != system.getenv('WEBHOOK_AUTHORIZATION')){
                 return JinkerResponse()

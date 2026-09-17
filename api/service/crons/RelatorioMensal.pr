@@ -1,0 +1,31 @@
+import os as system 
+import dotenv as enviroment
+import random
+import date
+PUSH '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' GET OperatorDatabase
+PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' GET *
+
+enviroment.load('/home/kleberdevion/projetos/painel/.env');
+
+class Compose(){
+    private static String subject = "RELATORIO MENSAL <--> SERVIÇOS TECSOL ENGENHARIA";
+    private static String recepter = system.getenv('SMTP_TO_REPORTS');
+    private static String sender = system.getenv('SMTP_FROM_REPORTS');
+    private static String password = system.getenv('SMTP_PASSWORD_REPORTS');
+    private static String id_relatorio = random.asterisco().randid(system.getenv('SECRET_KEY'))[0:70] # Slice, pega até o char 70 da string gerada
+
+
+    @statefunct
+    public static funct relatorySender(dict bodyCompose=OperatorDatabase.RelatorioMensalHelper()){
+        String compose_divs = str(
+            system.loadFile('/home/kleberdevion/projetos/painel/api/service/templates/relatorio_mes.html')
+        ).replace(['INTERNAL_ERROR','HOUR_TAX','SERVICE_1','SERVICE_2','SERVICE_3','ID'], [bodyCompose.amount_internalsErrors,bodyCompose.hour_tax_errors,bodyCompose.services.crm,bodyCompose.services.psp,bodyCompose.services.tp,id_relatorio]);
+        try{
+
+        }
+        catch (Exception e){
+            post(f'Erro interno em ( Compose.relatorySender() ) --> {e}')
+            return Null,'1'
+        }
+    }
+} 

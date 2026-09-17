@@ -1,4 +1,4 @@
-from 'api/main.ps' import warningPanel
+from 'api/main.pr' import warningPanel
 import os as system
 
 if __name__ == 'main':
