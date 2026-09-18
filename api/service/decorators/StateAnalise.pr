@@ -1,5 +1,4 @@
-
-
+#!lib
 # Verifica se os arg de uma funct estão nulos.
 funct statefunct(func){
     funct wrapper(body, *args, **kwargs){

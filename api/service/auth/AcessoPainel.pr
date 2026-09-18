@@ -1,5 +1,4 @@
 import random
-import mail
 import jwt
 import hash
 import date
@@ -14,7 +13,7 @@ env.load('/home/kleberdevion/projetos/painel/.env')
 
 public class PersonOperador() {
     private static String secret_key = system.getenv('SECRET_KEY');
-   
+
     public static funct login(dict data){
         dict infos_user = json.parse(data) # parseia pra dict PoolScript
         try{

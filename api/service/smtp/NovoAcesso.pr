@@ -1,0 +1,6 @@
+import mail
+import os as system
+
+class alert(){
+    private static PoolFile template = system.loadFile('/home/kleberdevion/projetos/painel/api/service/templates/newlogin.html');
+}

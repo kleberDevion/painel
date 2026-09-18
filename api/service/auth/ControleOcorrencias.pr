@@ -17,9 +17,11 @@ public class warnsInsertion() {
             if (conn and info){
                 mouse.execute('''
                 INSERT INTO logs_services (
-                    service_name, service_id, date_ocurrency, 
-                    type_error, status_code, id_transition
-                ) VALUES (%s, %s, %s, %s, %s, %s)
+                    service_name, service_id, date_ocurrency, type_error, status_code, id_transition
+                )
+                VALUES (
+                     %s, %s, %s, %s, %s, %s
+                );
                 ''', [
                     info.service_name, info.service_id, 
                     info.date_ocurrency, info.type_error, 

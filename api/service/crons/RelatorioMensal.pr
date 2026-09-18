@@ -2,6 +2,7 @@ import os as system
 import dotenv as enviroment
 import random
 import date
+import mail
 PUSH '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' GET OperatorDatabase
 PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' GET *
 

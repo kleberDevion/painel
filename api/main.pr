@@ -7,8 +7,8 @@ import sys
 # Modelo de login.
 from '/home/kleberdevion/projetos/painel/api/schemas/models/login.pr' import RotaLoginPAINEL, RotaSinginPAINEL;
 from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.pr' import PanelDoctors
-from '/home/kleberdevion/projetos/painel/api/service/acesso_painel.pr' import PersonOperador
-from '/home/kleberdevion/projetos/painel/api/service/controlWebhook.pr' import warnsInsertion
+from '/home/kleberdevion/projetos/painel/api/service/auth/AcessoPainel.pr' import PersonOperador
+from '/home/kleberdevion/projetos/painel/api/service/auth/ControleOcorrencias.pr' import warnsInsertion
 from '/home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.pr' import UNTILS
 from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import *
 #from '/home/kleberdevion/projetos/painel/api/service/decorators/login.pr' import schemaLogin
@@ -16,15 +16,15 @@ from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import
 env.load('/home/kleberdevion/projetos/painel/.env');
 
 public class warningPanel(){
-    #private static list dns = system.getenv('DOMAINS')
+    # private static list dns = system.getenv('DOMAINS')
     # Routesapp não carrega __name__ pois não e este aqruivo que executa como main
     public static Object Routesapp = Jinker( 
         oauth={
-            poolip: true, 
-            rate: true, 
-            tls: true, 
-            bloq: 200, 
-            cert: '/home/kleberdevion/projetos/painel/api/service/.config/certificate.jinkerTls', 
+            poolip: true,
+            rate: true,
+            tls: true,
+            bloq: 200,
+            cert: '/home/kleberdevion/projetos/painel/api/service/.config/certificate.jinkerTls',
             key: '/home/kleberdevion/projetos/painel/api/service/.config/key.jinkerTls.key'
         }, route_prefix='/api/v1/painel/'
     );
