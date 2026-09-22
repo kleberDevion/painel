@@ -16,6 +16,7 @@ public class OperatorDatabase() {
         'sqlite': system.getenv('DATABASE_SQLITE'),
     }
    
+    # Cria conecxão com o banco
     public static funct ConnectionDatabase(){
         object conn = psodbc.connect(banks['postgre'])
         if (conn){
@@ -24,6 +25,7 @@ public class OperatorDatabase() {
         raise Exception('Erro interno: Conexão com banco falhou')
     }
 
+    # Pega uma ocorrencia especifica
     @statefunct
     public static funct GetOcorrencias(dict data){
         object conn = OperatorDatabase.ConnectionDatabase()
@@ -46,20 +48,18 @@ public class OperatorDatabase() {
 
     # Depois irei terminar de criar a lib de paginação, e irei importar e utilizar aqui nesta funct.
     public static funct GetAllOcorrencias(){
-        object conn = pagination.page() # realizar a paginação
-        object mouse = conn.cursor()
-        if (conn){
-            mouse.execute('''
-            SELECT *
-            FROM logs_services
-            ''')
-            dict ocorrencias = mouse.fetchall()
-            return ocorrencias
-        }
+        result = pagination.page(
+            banks.postgre,
+            "SELECT * FROM logs_service ORDER BY id",
+            page="10",
+            per_page="30",
+            total="SELECT COUNT(*) AS total FROM logs_service"
+        ); return result
         raise Exception('Erro interno em (OperatorDatabase.GetAllOcorrencias())')
     }
 
-    public static dict funct RelatorioMensalHelper(){
+    # Pega os dados dos logs dos serviços e envia para o handler de email.
+    public static funct RelatorioMensalHelper(){
         object conn = OperatorDatabase.ConnectionDatabase()
         object mouse = conn.cursor()
         if (conn){

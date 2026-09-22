@@ -1,5 +1,15 @@
 from 'api/main.pr' import warningPanel
 import os as system
 
+string template = <2196f7>'''
+#############  #############  ##  ####       ## ############ ##
+##         ##  ##         ##  ##  ## ##      ## ##           ## 
+##         ##  ##         ##  ##  ##  ##     ## ##           ##
+#############  #############  ##  ##   ##    ## #######      ##
+##             ##         ##  ##  ##    ##   ## ##           ##
+##             ##         ##  ##  ##     ##  ## ##           ##
+##             ##         ##  ##  ##      ##### ############ ###########
+'''
+post(template)
 if __name__ == 'main':
     warningPanel.Routesapp(debug=true, host=system.getenv('HOST'), port=int(system.getenv('PORT', '1002')), reload=true);

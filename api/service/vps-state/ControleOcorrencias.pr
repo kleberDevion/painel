@@ -4,8 +4,8 @@ import dotenv as env
 import json
 
 from jinker import jsonify
-from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import OperatorDatabase
-from '/home/kleberdevion/projetos/painel/api/service/smtp/reports.pr' import SmtpReports
+from '/home/kleberdevion/projetos/painel/api/service/database/db.pr' import OperatorDatabase
+from '/home/kleberdevion/projetos/painel/api/service/smtp/insertion-ocurrency/reports.pr' import SmtpReports
 
 public class warnsInsertion() {
     public static funct OcorrenciaInsertion(dict info){
@@ -18,15 +18,8 @@ public class warnsInsertion() {
                 mouse.execute('''
                 INSERT INTO logs_services (
                     service_name, service_id, date_ocurrency, type_error, status_code, id_transition
-                )
-                VALUES (
-                     %s, %s, %s, %s, %s, %s
-                );
-                ''', [
-                    info.service_name, info.service_id, 
-                    info.date_ocurrency, info.type_error, 
-                    info.status_code, info.id_transition
-                ]); Integer InsertionResult = mouse.rowcount
+                ) VALUES (%s, %s, %s, %s, %s, %s)
+                ''', [info.service_name, info.service_id, info.date_ocurrency, info.type_error, info.status_code, info.id_transition]); Integer InsertionResult = mouse.rowcount
                 if InsertionResult > 0{
                     SmtpReports.reportInsertionOk(info)
                     return jsonify({'status': 200, 'message': 'Ocorrência inserida com sucesso!'})
@@ -35,9 +28,11 @@ public class warnsInsertion() {
                 return jsonify({'status': 400, 'message': 'Não foi possível inserir a ocorrência!'})
             }
         }
-        catch (Exception e){
-            post(f"Erro interno no servidor em ()")
-            return false
+        catch (Exception){
+            post(<yellow>f"Erro interno no servidor em" + <purple>"(Path: /home/kleberdevion/projetos/painel/api/service/auth/ControleOcorrencias.pr" + <purple>f"Funct: warningsInsertion().OcorrenciaInsertion()) --> {Exception}")
+            return jsonify({
+                "message": "Erro interno no servidor"
+            }), 500
         }
     }
 } 

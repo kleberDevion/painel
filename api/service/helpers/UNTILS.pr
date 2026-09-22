@@ -14,14 +14,14 @@ public class UNTILS() {
                 mouse.execute('''
                 SELECT token FROM tokens_webhook WHERE token_name = ?
                 ''', [token.token_name])
-                list result = mouse.fetchall()
+                dict result = mouse.fetchall()
                 if (result){ return True }
                 return False
             }
             raise ValueError('Erro interno: Não foi possível buscar os tokens do webhook')
         }
-        catch (Exception e){
-            post(f"Erro interno no servidor em ( UNTILS().getTokensWebhook() ) --> {e}");
+        catch (Exception){
+            post(<yellow>f"Erro interno no servidor em" + <purple>"(Path: /home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.pr" + <purple>f"Funct: getTokensWebhook()) --> {Exception}")
             return false
         }
     }

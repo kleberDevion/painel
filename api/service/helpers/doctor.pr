@@ -6,10 +6,10 @@ public class PanelDoctors() {
 
     public static funct DoctorBody(dict corpo){
         try{
-            dict itens = {'name': rg.match(r"/^[a-zA-Z]+(?: [a-zA-Z]+)*$/", 
-                corpo.nome),
-                'email': rg.match(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*$", 
-                corpo.email),'password': rg.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,30}$", corpo.senha)
+            dict itens = {
+                'name': rg.match(r"/^[a-zA-Z]+(?: [a-zA-Z]+)*$/", corpo.nome),
+                'email': rg.match(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*$", corpo.email),
+                'password': rg.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,30}$", corpo.senha)
             }
             if ([itens.name, itens.email, itens.password] == [true, true, true]){
                 return true 

@@ -7,55 +7,12 @@ import dotenv as env
 import os as system
 
 from jinker import jsonify
-from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import OperatorDatabase
+from '/home/kleberdevion/projetos/painel/api/service/database/db.pr' import OperatorDatabase
 
 env.load('/home/kleberdevion/projetos/painel/.env')
 
-public class PersonOperador() {
+public class PersonOperadorSingIn() {
     private static String secret_key = system.getenv('SECRET_KEY');
-
-    public static funct login(dict data){
-        dict infos_user = json.parse(data) # parseia pra dict PoolScript
-        try{
-            object conn = OperatorDatabase.ConnectionDatabase()
-            object mouse = conn.cursor()
-
-            if (conn.type() == Object and infos_user){
-                mouse.execute('''
-                    SELECT id, nome, email, senha 
-                    FROM usuarios 
-                    WHERE email = %s
-                ''', 
-                [hash.crypt(infos_user.email)]); dict result = mouse.fetchall() # potencial erro de retorno de tipo, pode vim, tanto lista quanto dicionario.
-
-                if (not result){ 
-                    conn.close(); return jsonify({'status': 404, 'message': 'User not found'}) 
-                }
-                # Compara hash do banco com senha, gerando um novo hash interno e comparando
-                if (hash.check(result[3], infos_user.senha) == false){
-                    conn.close(); return jsonify({'status': 405, 'message': 'Credentials error'})
-
-                } else{
-                    dict payload = {
-                       'exp': date.timestamp() + date.hora(hours=10, minutes=1),
-                       'nome': infos_user.nome,
-                       'email': infos_user.email
-                    }
-                    string token = jwt.gen(payload, secret_key, algorithm='HS256');
-                    conn.close();
-                    return jsonify({ 'name': infos_user.nome, 'token': token, 'status': 200 })
-                }
-            }
-            conn.close()
-            return jsonify({'status': 422, 'message': 'Server Internal error'})
-        }
-        catch (Exception e){
-            post(f'Erro interno em acesso_painel.ps (Person.login()) --> {e}')
-            return jsonify({
-                "message": "Server Internal error", "status": 500
-            })
-        }
-    }
 
     public static funct singin(dict data){
         dict infos_user = json.parse(data)

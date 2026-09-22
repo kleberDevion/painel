@@ -18,7 +18,7 @@ public class SmtpReports() {
     public static funct reportInsertionOk(dict info_error){
         dict inf = json.parse(info_error)
         try{
-            string bodyFormat = body_html.raplace(['ERROR_TYPE', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], [
+            string bodyFormat = str(body_html).replace(['ERROR_TYPE', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], [
                 inf.info.type_error, inf.info.data_ocorrencia, 
                 inf.info.nome_servico, inf.info.id_transition
             ]);
@@ -39,9 +39,9 @@ public class SmtpReports() {
             return Null,'2'
            
         }
-        catch (Exception e){
-            post(f"Erro interno no servidor em ( SmtpReports().sendMail() ) --> {e}");
-            return Null,'3'
+        catch (Exception){
+            post(f"Erro interno no servidor em ( SmtpReports().sendMail() ) --> {Exception}");
+            raise Exception
         }
     }
 
@@ -49,7 +49,7 @@ public class SmtpReports() {
     public static funct reportInsertionFalse(dict info_error){
         dict inf = json.parse(info_error)
         try{
-            string bodyFormat = body_html.raplace(['ERROR_TYPE', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], [
+            string bodyFormat = str(body_html).replace(['ERROR_TYPE', 'DATE_OCURRENCY', 'SERVICE_NAME', 'ID_TRANSITION'], [
                 inf.info.type_error, inf.info.data_ocorrencia, 
                 inf.info.nome_servico, inf.info.id_transition
             ]);
@@ -70,9 +70,9 @@ public class SmtpReports() {
             return Null,'2'
            
         }
-        catch (Exception e){
-            post(f"Erro interno no servidor em ( SmtpReports().sendMail() ) --> {e}");
-            return Null,'3'
+        catch (Exception){
+            post(f"Erro interno no servidor em ( SmtpReports().sendMail() ) --> {Exception}");
+            raise Exception
         }
     }
 }

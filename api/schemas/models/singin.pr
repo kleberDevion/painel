@@ -1,4 +1,5 @@
-model LoginPAINEL(){
+model SinginPAINEL(){
+    nome: string(length=60, regex=r'')
     email: str(length=100, regex=r'')
     senha: string(length=30, regex=r'')
 }

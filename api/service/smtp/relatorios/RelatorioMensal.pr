@@ -3,7 +3,7 @@ import dotenv as enviroment
 import random
 import date
 import mail
-PUSH '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' GET OperatorDatabase
+PUSH '/home/kleberdevion/projetos/painel/api/service/database/db.pr' GET OperatorDatabase
 PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' GET *
 
 enviroment.load('/home/kleberdevion/projetos/painel/.env');
@@ -17,12 +17,32 @@ public class Compose(){
 
 
     @statefunct
-    public static funct relatorySender(dict bodyCompose=OperatorDatabase.RelatorioMensalHelper()){
-        string compose_divs = str(
+    public static funct relatorySender(){
+        dict bodyCompose = OperatorDatabase.RelatorioMensalHelper()
+        string body = str(
             system.loadFile('/home/kleberdevion/projetos/painel/api/service/templates/relatorio_mes.html')
         ).replace(['INTERNAL_ERROR','HOUR_TAX','SERVICE_1','SERVICE_2','SERVICE_3','ID'], [bodyCompose.amount_internalsErrors,bodyCompose.hour_tax_errors,bodyCompose.services.crm,bodyCompose.services.psp,bodyCompose.services.tp,id_relatorio]);
         try{
+            object connectionSMTP = mail.MailServer()
+            connectionSMTP.conn('smtp.gmail.com', 587)
+            connectionSMTP.login(sender, password)
 
+            if (connectionSMTP){
+                object message = mail.MailMessage()
+
+                if (message){
+                    message.fromAddress(sender); message.toAddress(recepter)
+                    message.subject(subject); message.body(body, true)
+
+                    connectionSMTP.send(message)
+                    connectionSMTP.quit()
+                    return True
+                }
+                connectionSMTP.quit()
+                raise Exception('Erro interno')
+            }
+            connectionSMTP.quit()
+            raise Exception('Erro interno')
         }
         catch (Exception e){
             post(f'Erro interno em ( Compose.relatorySender() ) --> {e}')

@@ -1,9 +1,0 @@
-import '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' *
-
-
-@statefunct
-funct main(body){
-    return 'oi'
-}
-
-post(main(body=null))
