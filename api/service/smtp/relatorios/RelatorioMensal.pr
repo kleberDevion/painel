@@ -4,19 +4,16 @@ import random
 import date
 import mail
 PUSH '/home/kleberdevion/projetos/painel/api/service/database/db.pr' GET OperatorDatabase
-PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' GET *
 
 enviroment.load('/home/kleberdevion/projetos/painel/.env');
 
-public class Compose(){
+public class Compose {
     private static String subject = "RELATORIO MENSAL <--> SERVIÇOS TECSOL ENGENHARIA";
     private static String recepter = system.getenv('SMTP_TO_REPORTS');
     private static String sender = system.getenv('SMTP_FROM_REPORTS');
     private static String password = system.getenv('SMTP_PASSWORD_REPORTS');
     private static String id_relatorio = random.asterisco().randid(system.getenv('SECRET_KEY'))[0:70] # Slice, pega até o char 70 da string gerada
 
-
-    @statefunct
     public static funct relatorySender(){
         dict bodyCompose = OperatorDatabase.RelatorioMensalHelper()
         string body = str(
@@ -44,9 +41,9 @@ public class Compose(){
             connectionSMTP.quit()
             raise Exception('Erro interno')
         }
-        catch (Exception e){
-            post(f'Erro interno em ( Compose.relatorySender() ) --> {e}')
-            return Null,'1'
+        catch (Exception){
+            post(f'Erro interno em ( Compose.relatorySender() ) --> {Exception}')
+            return Exception
         }
     }
 } 

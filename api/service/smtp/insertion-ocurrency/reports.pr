@@ -3,9 +3,7 @@ import os as environment
 import date
 import json
 
-import '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' *
-
-public class SmtpReports() {
+public class SmtpReports {
     public static String subject = "ServerPanelError - Tecsol Engenharia";
     public static String recepter = environment.getenv('SMTP_TO_REPORTS');
     public static String sender = environment.getenv('SMTP_FROM_REPORTS');
@@ -14,7 +12,6 @@ public class SmtpReports() {
     public static PoolFile body_html = environment.loadFile('/home/kleberdevion/projetos/painel/api/service/templates/REPORT_BODY.html');
    
     # info e o dict que e passado com os registros de erro dos serviços
-    @statefunct
     public static funct reportInsertionOk(dict info_error){
         dict inf = json.parse(info_error)
         try{
@@ -44,8 +41,7 @@ public class SmtpReports() {
             raise Exception
         }
     }
-
-    @statefunct
+ 
     public static funct reportInsertionFalse(dict info_error){
         dict inf = json.parse(info_error)
         try{

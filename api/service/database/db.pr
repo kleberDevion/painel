@@ -3,13 +3,11 @@ import os as system
 import dotenv as env
 import sqlite3
 
-import poolscript.libs.pagination
-
-PUSH '/home/kleberdevion/projetos/painel/api/service/decorators/StateAnalise.pr' GET *
+import jinga.libs.pagination
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
-public class OperatorDatabase() {
+public class OperatorDatabase {
     private static dictionary banks = {
         'postgre': system.getenv('DATABASE_POSTGRESQL'),
         'mysql': system.getenv('DATABASE_MYSQL'),
@@ -26,7 +24,6 @@ public class OperatorDatabase() {
     }
 
     # Pega uma ocorrencia especifica
-    @statefunct
     public static funct GetOcorrencias(dict data){
         object conn = OperatorDatabase.ConnectionDatabase()
         object mouse = conn.cursor()

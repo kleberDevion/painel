@@ -2,7 +2,7 @@ import regex as rg
 import os as system
 import json
 
-public class PanelDoctors() {
+public class PanelDoctors {
 
     public static funct DoctorBody(dict corpo){
         try{

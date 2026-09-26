@@ -2,7 +2,7 @@ import os as system
 import dotenv as env
 import psodbc
 
-public class UNTILS() {
+public class UNTILS {
     private static String urlConnection = system.getenv('DATABASE_TOKENS_WEBHOOK')
 
     public static funct getTokensWebhook(dict token){

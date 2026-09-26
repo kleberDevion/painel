@@ -11,7 +11,7 @@ from '/home/kleberdevion/projetos/painel/api/service/database/db.pr' import Oper
 
 env.load('/home/kleberdevion/projetos/painel/.env')
 
-public class PersonOperadorSingIn() {
+public class PersonOperadorSingIn {
     private static String secret_key = system.getenv('SECRET_KEY');
 
     public static funct singin(dict data){

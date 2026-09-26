@@ -5,18 +5,19 @@ import dotenv as env
 import sys
 
 # Modelo de login.
-from '/home/kleberdevion/projetos/painel/api/schemas/models/login.pr' import RotaLoginPAINEL, RotaSinginPAINEL;
+from '/home/kleberdevion/projetos/painel/api/schemas/models/login.pr' import LoginPAINEL 
+from '/home/kleberdevion/projetos/painel/api/schemas/models/singin.pr'import SinginPAINEL
 from '/home/kleberdevion/projetos/painel/api/service/helpers/doctor.pr' import PanelDoctors
 from '/home/kleberdevion/projetos/painel/api/service/controllers/userLogin/controller-userlogin.pr' import PersonOperadorLogin
 from '/home/kleberdevion/projetos/painel/api/service/controllers/userSingin/controller-usersingin.pr' import PersonOperadorSingIn
 from '/home/kleberdevion/projetos/painel/api/service/vps-state/ControleOcorrencias.pr' import warnsInsertion
 from '/home/kleberdevion/projetos/painel/api/service/helpers/UNTILS.pr' import UNTILS
-from '/home/kleberdevion/projetos/painel/api/service/database.conn/db.pr' import *
+from '/home/kleberdevion/projetos/painel/api/service/database/db.pr' import *
 #from '/home/kleberdevion/projetos/painel/api/service/decorators/login.pr' import schemaLogin
 
 env.load('/home/kleberdevion/projetos/painel/.env');
 
-public class warningPanel(){
+public class warningPanel {
     # private static list dns = system.getenv('DOMAINS')
     # Routesapp não carrega __name__ pois não e este aqruivo que executa como main
     public static Object Routesapp = Jinker( 
@@ -24,16 +25,16 @@ public class warningPanel(){
             'poolip': true,
             'rate': true,
             'tls': true,
-            'bloq': 200,
+            'bloq': 20000,
             'cert': '/home/kleberdevion/projetos/painel/api/service/.config/certificate.jinkerTls',
             'key': '/home/kleberdevion/projetos/painel/api/service/.config/key.jinkerTls.key'
-        }, route_prefix='/api/v1/painel/'
+        }, route_prefix='/api/v1/'
     );
-    private static Object CrossOrigin = cors(Routesapp, origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'])
+    private static Object CrossOrigin = cors(Routesapp, origins=['https://api.tecsolengenharia.com.br', 'https://auth.tecsolengenharia.com.br'], local=true)
     # MIDDLEWARE PARA AUTENTICAÇÃO DE TOKEN WEBHOOK
     @Routesapp.middleware()
     public funct middle(self){
-        if (UNTILS.getTokensWebhook(request.headers.get(key='Authorization')) == false){
+        if (UNTILS.getTokensWebhook(request.headers.get('Authorization')) == false){
             return JinkerResponse()
                    .header('Content-Type', 'application/json')
                    .json({'status': 403, 'message': 'Forbidden'})
@@ -49,7 +50,7 @@ public class warningPanel(){
     }
 
     # Rota de login no painel
-    @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=RotaLoginPAINEL, middleware=Routesapp.middleware)
+    @Routesapp.post('/loginpanel:form', auth=CrossOrigin.origins(), model=LoginPAINEL, middleware=Routesapp.middleware)
     public funct handlerLogin(self, dict form){
         if (!PanelDoctors.DoctorBody(form) == false){
             return JinkerResponse()
@@ -82,7 +83,7 @@ public class warningPanel(){
     }
 
     # Criar conta de usuario
-    @Routesapp.post('/sing-inpanel', model=RotaSinginPAINEL, auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
+    @Routesapp.post('/sing-inpanel', model=SinginPAINEL, auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
     public funct handlerSingin(self, dict form){
         if (!PanelDoctors.DoctorBody(form)){
             return JinkerResponse()
@@ -159,10 +160,15 @@ public class warningPanel(){
         }
     }
 
-    @Routesapp.socket('/real-time', channel=True)
+    @Routesapp.socket('/real-time:room', channel=True)
     public funct handlerRealTime(self){
         try{
-            app.channel(forAll=composer)
+            if (request.path_param('room')){
+                dictionary message = request.get_json()
+                string roomId = request.path_param('room')
+                Routesapp.socket.emit(payload=message, room_id=roomId)
+            }
+            return 'Erro: Vc é burro ??'
         }
         catch (Exception){
             post(<yellow>f"Erro interno no servidor em" + <purple>"(Path: /home/kleberdevion/projetos/painel/api/main.pr" + <purple>f"Funct: handlerRealTime()) --> {Exception}")
@@ -170,6 +176,11 @@ public class warningPanel(){
                    .header('Content-Type', 'application/json')
                    .json({'status': 500, 'message': 'Server Internal Error'})
         }
+    }
+
+    @Routesapp.get('/new-token', auth=CrossOrigin.origins(), middleware=Routesapp.middleware)
+    public funct handlerNewToken(self){
+        return 'sem func'
     }
 
 }
